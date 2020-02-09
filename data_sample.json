@@ -1,6 +1,6 @@
 {
 	"setup": {
-		"caption": "Reservation Room",
+		"caption": "Parking Permit",
 		"sendsuccessemail": "yes"
 	},
 	"emailsetup": {
@@ -13,27 +13,29 @@
 	},
 	"urls": [
 		{
-			"url": "http://reserve.room.com",
+			"url": "http://reserve.localhost",
 			"validationtext": [
 				"Welcome to Reserve Room System\\.",
 				"Please enter your access code #"
 			],
 			"parameters": {
 			},
+			"submithidden": "no",
 			"successmessage": ""
 		},
 		{
-			"url": "http://reserve.room.com/index.php",
+			"url": "http://reserve.localhost/index.php",
 			"validationtext": [
 				"(?:Left 1|Left 2|Left 3) books available out of your weekly allowance of \\d{1}\\."
 			],
 			"parameters": {
 				"CODE": "00000000"
 			},
+			"submithidden": "no",
 			"successmessage": ""
 		},
 		{
-			"url": "http://reserve.room.com/registerverify.php",
+			"url": "http://reserve.localhost/registerverify.php",
 			"validationtext": [
 			],
 			"parameters": {
@@ -41,9 +43,19 @@
 				"DAYS": "1",
 				"STARTING": "$((date.today()+timedelta(days=1)).strftime('%Y-%m-%d') + ' 00:01')",
 				"EMAIL": "zxc@opu.com",
-				"CODE": "00000000"
+				"EMAIL2": "zxc@opu.com"
 			},
+			"submithidden": "yes",
 			"successmessage": ""
+		},
+		{
+			"url": "http://reserve.localhost/register.php",
+			"validationtext": [
+			],
+			"parameters": {
+			},
+			"submithidden": "yes",
+			"successmessage": "Registration of plate .* is complete\\."
 		}
 	]
 }
