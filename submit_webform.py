@@ -1,9 +1,12 @@
-import requests
 from os import path
 import sys
 
 import json
 import re
+import argparse
+
+import requests
+
 from datetime import date
 from datetime import timedelta
 
@@ -13,7 +16,7 @@ from email.mime.multipart import MIMEMultipart
 
 class CompletionCode:
     SUCCESS = 0
-    SETUP_FILE_NOT_FOUND = 1
+    DATA_FILE_NOT_FOUND = 1
     FAILED_VALIDATION = 2
     FINAL_VALIDATION_FAILED = 3
     NOT_VALIDATED_SUBMITTION = 4
@@ -71,92 +74,103 @@ def collect_hidden_values(web_text):
 
 if __name__ == '__main__':
     
-    app_root_folder = path.dirname(__file__)
+    parser = argparse.ArgumentParser(description="Autofill and submit webforms")
+
+    parser.add_argument("-f", "--file", dest='file',
+                        required=True,
+                        help="Definition file path")
     
-    data_json_path = path.join(app_root_folder, 'data_b.json')
+    args = parser.parse_args()
     
-    data_json = json.load(open(data_json_path))
+    data_json_path = path.abspath(args.file)
     
-    email_setup = data_json['emailsetup']
+    if path.exists(data_json_path) and path.isfile(data_json_path):
     
-    caption = data_json['setup']['caption']
-    send_success_email = (data_json['setup']['sendsuccessemail']).lower()
-    
-    error_message = None
-    web_response = None
-    web_text = None
-    
-    completion_code = CompletionCode.RUNTIME_ERROR
-    
-    hidden_parameter_list = {}
-    
-    for webform in data_json['urls']:
-        url = webform['url']
-        validation_text_list = webform['validationtext']
-        parameter_list = webform['parameters']
-        submit_hidden = webform['submithidden'].lower()
-        success_mesage = webform['successmessage']
+        data_json = json.load(open(data_json_path))
         
-        is_post = len(parameter_list)>0 or submit_hidden=='yes'
+        email_setup = data_json['emailsetup']
         
-        if is_post:
-            params = calculate_parameters(parameter_list)
+        caption = data_json['setup']['caption']
+        send_success_email = (data_json['setup']['sendsuccessemail']).lower()
+        
+        error_message = None
+        web_response = None
+        web_text = None
+        
+        completion_code = CompletionCode.RUNTIME_ERROR
+        
+        hidden_parameter_list = {}
+        
+        for webform in data_json['urls']:
+            url = webform['url']
+            validation_text_list = webform['validationtext']
+            parameter_list = webform['parameters']
+            submit_hidden = webform['submithidden'].lower()
+            success_mesage = webform['successmessage']
             
-            # add hidden values as parameters
-            if submit_hidden=='yes':
-                for hidden_parameter in hidden_parameter_list.keys():
-                    if not hidden_parameter in params:
-                        params[hidden_parameter] = hidden_parameter_list[hidden_parameter]
+            is_post = len(parameter_list)>0 or submit_hidden=='yes'
+            
+            if is_post:
+                params = calculate_parameters(parameter_list)
                 
-            web_response = requests.post(url, data=params)
-        else:
-            web_response = requests.get(url)
-            
-        web_text= web_response.text
-        
-        hidden_parameter_list = collect_hidden_values(web_text)
-        
-        found_validation_text_list = {}
-        for validation_text in validation_text_list:
-            matched = re.search(validation_text, web_text)
-            if matched:
-                found_validation_text_list[validation_text] = matched.group(0)
+                # add hidden values as parameters
+                if submit_hidden=='yes':
+                    for hidden_parameter in hidden_parameter_list.keys():
+                        if not hidden_parameter in params:
+                            params[hidden_parameter] = hidden_parameter_list[hidden_parameter]
+                    
+                web_response = requests.post(url, data=params)
             else:
-                error_message = 'Failed validation "{}" in "{}"'.format(validation_text, url)
+                web_response = requests.get(url)
+                
+            web_text= web_response.text
+            
+            hidden_parameter_list = collect_hidden_values(web_text)
+            
+            found_validation_text_list = {}
+            for validation_text in validation_text_list:
+                matched = re.search(validation_text, web_text)
+                if matched:
+                    found_validation_text_list[validation_text] = matched.group(0)
+                else:
+                    error_message = 'Failed validation "{}" in "{}"'.format(validation_text, url)
+                    break
+            
+                    
+            if not error_message==None:
                 break
         
-                
-        if not error_message==None:
-            break
-    
-    if error_message:
-        body = error_message
-        if web_response:
-            body += '\n\n' + str(web_response)
-        if web_text:
-            body += '\n\n' + web_text
-        send_email(caption + ' - Error', body, email_setup)
-        completion_code = CompletionCode.FAILED_VALIDATION
-    else:
-        if success_mesage:
-            matched = re.search(success_mesage, web_text)
-            if matched:
-                if send_success_email=='yes':
-                    body = web_text
-                    send_email(caption + ' - Success', body, email_setup)
-                completion_code = CompletionCode.SUCCESS
-            else:
-                body = web_text
-                send_email(caption + ' - Error', body, email_setup)
-                completion_code = CompletionCode.FINAL_VALIDATION_FAILED
-        else:
-            body = 'Succesful message is not found in data setup file'
+        if error_message:
+            body = error_message
             if web_response:
                 body += '\n\n' + str(web_response)
             if web_text:
                 body += '\n\n' + web_text
-            send_email(caption + ' - Not validated submittion', body, email_setup)
-            completion_code = CompletionCode.NOT_VALIDATED_SUBMITTION
-    
+            send_email(caption + ' - Error', body, email_setup)
+            completion_code = CompletionCode.FAILED_VALIDATION
+        else:
+            if success_mesage:
+                matched = re.search(success_mesage, web_text)
+                if matched:
+                    if send_success_email=='yes':
+                        body = web_text
+                        send_email(caption + ' - Success', body, email_setup)
+                    completion_code = CompletionCode.SUCCESS
+                else:
+                    body = web_text
+                    send_email(caption + ' - Error', body, email_setup)
+                    completion_code = CompletionCode.FINAL_VALIDATION_FAILED
+            else:
+                body = 'Succesful message is not found in data setup file'
+                if web_response:
+                    body += '\n\n' + str(web_response)
+                if web_text:
+                    body += '\n\n' + web_text
+                send_email(caption + ' - Not validated submittion', body, email_setup)
+                completion_code = CompletionCode.NOT_VALIDATED_SUBMITTION
+    else:
+        print('Error. "{}" data file not found'.format(data_json_path))
+        completion_code = CompletionCode.DATA_FILE_NOT_FOUND
+        
     sys.exit(completion_code)
         
