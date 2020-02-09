@@ -62,12 +62,12 @@ It can be any number of steps in your workflow. They are included in a list.
 ```
 * `url` - url to open or submit a web page.
 * `validationtext` - a list of messages which expected to receive in the current web form. If a list is matched, we can be sure that we are on a right web form. It can help identify cases when system has been modified. Validation messages can include `regexp`, for example, `(?:Left 1|Left 2|Left 3) books available out of your weekly allowance of \\d{1}\\.`.   
-* `parameters` - list of parameters as name and value pairs for POST submission. A macro is acceptable in value fields. The macro is `$()`. Everything contained in macro is executed, for example, `STARTING": "$((date.today()+timedelta(days=1)).strftime('%Y-%m-%d') + ' 00:01')"`. We get the current data, add 1 day, convert into string, and add time.  
-* `submithidden` - a received web form can include some hidden fields. Those fields can be extracted and submitted in POST command.
+* `parameters` - list of parameters as name and value pairs for POST submission. A macro is acceptable in value fields. The macro is `$()`. Everything contained in macro is executed, for example, `STARTING": "$((date.today()+timedelta(days=1)).strftime('%Y-%m-%d') + ' 00:01')"`. We get the current date, add 1 day, convert into string, and add time.  
+* `submithidden` - a received web form can include some hidden fields. Those fields can be extracted and submitted in following POST command.
 * `successmessage` - it's applicable to final step in workflow to make sure that a submission has been completed successfully. It contains a successful message returned by POST submission.
 
 ## Setup
-Install requests library
+Install `requests` library
 
 ```bash
 pip install requests
