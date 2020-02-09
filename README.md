@@ -8,7 +8,7 @@ It can be solved automating this routine with a tool.
 
 ## Introduction
 
-The tool is designed in form of execution engine with a definition file. We need to tell what we need to do in the definition file. The instructions are arranged as a set of workflow steps. Each step opens or submits a web page. It's flexible in terms of customizing it to fit a wide range of registration systems.
+The tool is designed in form of execution engine with a definition file. We tell what we need to do in the definition file. The instructions are arranged as a set of workflow steps. Each step opens or submits a web page. It's flexible in terms of customizing to fit a wide range of registration systems.
 
 ## Definition file
 
@@ -20,7 +20,9 @@ The tool is designed in form of execution engine with a definition file. We need
 		"sendsuccessemail": "yes"
 	}
 ```
-This is applicable globally to all workflow steps. `caption` is your name to a registration system in your notification emails. `sendsuccessemail` notifies you with an email if all steps completed successfully.
+This is applicable globally to all workflow steps. 
+* `caption` is your name for a registration system in your notification emails. 
+* `sendsuccessemail` notifies you with an email if all steps completed successfully.
 
 ### Email section
 
@@ -58,11 +60,18 @@ It can be any number of steps in your workflow. They are included in a list.
 	"successmessage": ""
 }
 ```
-`url` - url to open or submit a web page.
-`validationtext` - a list of messages which expected to receive in the current web form. If a list is matched, we can be sure that we are on a right web form. It can help identify cases when system has been modified. Validation messages can include `regexp`, for example, `(?:Left 1|Left 2|Left 3) books available out of your weekly allowance of \\d{1}\\.`.   
-`parameters` - list of parameters as name and value pairs for POST submission. A macro is acceptable in value fields. The macro is `$()`. Everything contained in macro is executed, for example, `STARTING": "$((date.today()+timedelta(days=1)).strftime('%Y-%m-%d') + ' 00:01')"`. We get the current data, add 1 day, convert into string, and add time.  
-`submithidden` - a received web form can include some hidden fields. Those fields can be extracted and submitted in POST command.
-`successmessage` - it's applicable to final step in workflow to make sure that a submission has been completed successfully. It contains a successful message returned by POST submission.
+* `url` - url to open or submit a web page.
+* `validationtext` - a list of messages which expected to receive in the current web form. If a list is matched, we can be sure that we are on a right web form. It can help identify cases when system has been modified. Validation messages can include `regexp`, for example, `(?:Left 1|Left 2|Left 3) books available out of your weekly allowance of \\d{1}\\.`.   
+* `parameters` - list of parameters as name and value pairs for POST submission. A macro is acceptable in value fields. The macro is `$()`. Everything contained in macro is executed, for example, `STARTING": "$((date.today()+timedelta(days=1)).strftime('%Y-%m-%d') + ' 00:01')"`. We get the current data, add 1 day, convert into string, and add time.  
+* `submithidden` - a received web form can include some hidden fields. Those fields can be extracted and submitted in POST command.
+* `successmessage` - it's applicable to final step in workflow to make sure that a submission has been completed successfully. It contains a successful message returned by POST submission.
+
+## Setup
+Install requests library
+
+```bash
+pip install requests
+```
 
 ## Usage
 ```text
@@ -79,11 +88,3 @@ optional arguments:
 ```bash
 python3.6 submit_webform.py -f data_parking.json
 ```
-
-## Setup
-Install requests library
-
-```bash
-pip install requests
-```
- 
