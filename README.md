@@ -4,11 +4,11 @@
 
 In some cases, you need to do online registrations on regular basis. It requests to open a web page, fill up a set of fields, and submit the page. Number of web pages can be more than one and each web page contains a bunch of fields along with validating of entered data. A real-life sample is a parking permit in a condo. Your kid has grown up and he buys a car. His car can't be accommodated in your parking lots because of limit. Your kid comes home 3 times per week from university. You have an allowance to park your guest cars overnight on visitor parking. You need to remember to obtain the parking permit for your kid's car every week. Also, you need to follow the same boring procedure every time when you submit your application. How it sounds?
 
-It can be solved automating this routine with a tool.
+It can be solved automating this routine.
 
 ## Introduction
 
-The tool is designed in form of execution engine with a definition file. We tell what we need to do in the definition file. The instructions are arranged as a set of workflow steps. Each step opens or submits a web page. It's flexible in terms of customizing to fit a wide range of registration systems.
+The tool is designed in a form of execution engine with a setup file. We tell what we need to do in the setup file. The instructions are arranged as a set of workflow steps. Each step opens or submits a web page. It's flexible in terms of customizing to fit a wide range of registration systems.
 
 ## Definition file
 
@@ -21,8 +21,8 @@ The tool is designed in form of execution engine with a definition file. We tell
 	}
 ```
 This is applicable globally to all workflow steps. 
-* `caption` is your name for a registration system in your notification emails. 
-* `sendsuccessemail` notifies you with an email if all steps completed successfully.
+* `caption` - your name for a registration system in your notification emails. 
+* `sendsuccessemail` - flag to notify you with an email if all steps completed successfully.
 
 ### Email section
 
