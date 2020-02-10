@@ -10,7 +10,7 @@ It can be solved automating this routine.
 
 The tool is designed in a form of execution engine with a setup file. We tell what we need to do in the setup file. The instructions are arranged as a set of workflow steps. Each step opens or submits a web page. It's flexible in terms of customizing to fit a wide range of registration systems.
 
-## Definition file
+## Setup file
 
 ### Header section
 
