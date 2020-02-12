@@ -67,6 +67,7 @@ It can be any number of steps in your workflow. They are included in a list.
 * `successmessage` - it's applicable to final step in workflow to make sure that a submission has been completed successfully. It contains a successful message returned by POST submission.
 
 ## Setup
+
 Install `requests` library
 
 ```bash
@@ -74,6 +75,7 @@ pip install requests
 ```
 
 ## Usage
+
 ```text
 usage: submit_webform.py [-h] -f FILE
 
@@ -85,6 +87,65 @@ optional arguments:
 ```
 
 ## Usage sample
+
 ```bash
 python3.6 submit_webform.py -f data_parking.json
+```
+
+## Return codes
+
+Those codes are
+
+0 - success.
+
+1 - setup file is not found.
+
+2 - a web page validation is failed. It can be encountered if `validationtext` list doesn't match with a response received.
+ 
+3 - this is applicable to final step when we don't receive expected text during the last response. The setup file key is `successmessage`.
+
+4 - everything is completed successfully but the final step in the setup file doesn't have value for `successmessage` key.
+
+127 - run-time error.
+
+## Implementation
+
+The final step is to establish a process of running of the tool at specified times. There are many possibilities to come up with. The easiest ways are crontab in Unix or Task Scheduler in Windows. More advanced level is systemd in Unix. The best implementation is to run it in an isolated environment with minimum resources consumed. It's containerization topic with Docker.
+
+### Crontab in Unix
+
+The description is based on CentOS 7 distribution.
+
+* Validate if crontab daemon running.
+
+```bash
+sudo systemctl status crond
+```
+ 
+```text
+crond.service - Command Scheduler
+   Loaded: loaded (/usr/lib/systemd/system/crond.service; enabled; vendor preset: enabled)
+   Active: active (running) since Tue 2020-02-11 20:24:44 EST; 25min ago
+ Main PID: 1569 (crond)
+    Tasks: 1
+   CGroup: /system.slice/crond.service
+           └─1569 /usr/sbin/crond -n
+```
+
+* Add a new job to crontab.
+
+```bash
+crontab -e
+```
+
+Enter the command. It runs the tool Friday, Monday, and Tuesday at 7:00 pm and directs any output to a log file.
+
+```text
+* 19 * * fri,mon,tue python3.6 /home/developer/auto-fill-submit-webform/submit_webform.py -f /home/developer/auto-fill-submit-webform/data_parking.json >> /home/developer/auto-fill-submit-webform/log/parking.log
+```
+
+* Validate the job.
+
+```bash
+crontab -l
 ```
