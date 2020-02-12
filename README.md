@@ -91,7 +91,6 @@ optional arguments:
 ```bash
 python3.6 submit_webform.py -f data_parking.json
 ```
-<<<<<<< HEAD
 
 ## Return codes
 
@@ -150,5 +149,3 @@ Enter the command. It runs the tool Friday, Monday, and Tuesday at 7:00 pm and d
 ```bash
 crontab -l
 ```
-=======
->>>>>>> branch 'master' of https://github.com/larandvit/auto-fill-submit-webform.git
