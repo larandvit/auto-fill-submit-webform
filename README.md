@@ -94,8 +94,6 @@ python3.6 submit_webform.py -f data_parking.json
 
 ## Return codes
 
-Those codes are
-
 0 - success.
 
 1 - setup file is not found.
