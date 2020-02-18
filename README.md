@@ -108,9 +108,9 @@ python3.6 submit_webform.py -f data_parking.json
 
 ## Implementation
 
-The final step is to establish a process of running of the tool at specified times. There are many possibilities to come up with. The easiest ways are crontab in Unix or Task Scheduler in Windows. More advanced level is systemd in Unix. The best implementation is to run it in an isolated environment with minimum resources consumed. It's containerization topic with Docker.
+The final step is to establish a process of running of the tool at specified times. There are many possibilities to come up with. The easiest ways are cron in Unix or Task Scheduler in Windows. More advanced level is systemd in Unix. The best implementation is to run it in an isolated environment with minimum resources consumed. It's containerization topic with Docker.
 
-### Crontab in Unix
+### Cron in Unix
 
 The description is based on CentOS 7 distribution.
 
@@ -146,4 +146,39 @@ Enter the command. It runs the tool Friday, Monday, and Tuesday at 7:00 pm and d
 
 ```bash
 crontab -l
+```
+
+### Docker container with Cron
+
+CentOS 7 official Docker image is used to build a new image with Cron. Cron is a time-based job scheduler.
+
+1. Create your setup json file. data_sample.json can be used as your template. 
+
+2. Adjust `Dockerfile` to your requirements
+    * Set up your time zone in `/usr/share/zoneinfo/America/Toronto`
+    * Define your schedule in `25 04 * * sun,mon,tue`
+
+3. Make sure that the files below are located in your working folder
+    * setup json file
+    * Dockerfile
+    * submit_webform.py
+
+4.  Make your working folder the current one, for example,
+```bash
+cd Projects/auto-fill-submit-webform
+```
+
+5. Build a new image with the Dockerfile.
+```bash
+sudo docker build --rm -t local/c7-auto-fill-web-form .
+```
+
+6. Run your container. It's your final step.
+```
+sudo docker run --privileged --name=parking –v /sys/fs/cgroup:/sys/fs/cgroup:ro -d local/c7-auto-fill-web-form
+```
+    
+7. If you need to connect to the container in a terminal, run the command.
+```bash
+sudo docker exec -it parking /bin/bash
 ```
